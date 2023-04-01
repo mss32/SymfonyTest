@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+ <h1>Расчет цены продукта</h1>
+
+    {{ form_start(form) }}
+    {{ form_row(form.product, { 'label': 'Продукт' }) }}
+    {{ form_row(form.taxNumber, { 'label': 'Tax номер' }) }}
+    {{ form_row(form.submit, { 'label': 'Отправить'}) }}
+    {{ form_end(form) }}
+{% endblock %}
