@@ -3,3 +3,8 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+price_calculator:
+    path: /
+    controller: App\Controller\PriceController::index
+    methods: [GET, POST]

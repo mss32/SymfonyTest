@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block body %}
     <h1>Расчет цены продукта</h1>
-    Цена: {{ final_price }}
+    <p>Название продукта: {{ product.name }}</p>
+    <p>Цена: {{ product.price }}</p>
+    <p>Цена c процентами: {{ priceWithTax }}</p>
 {% endblock %}

@@ -1,43 +1,65 @@
 <?php
 namespace App\Form;
 
+use App\Entity\Product;
+use App\Service\ProductService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Regex;
 
 class ProductType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * @var ProductService $productService
+     */
+    private $productService;
+
+    /**
+     * @param ProductService $productService
+     */
+    public function __construct(ProductService $productService)
     {
-        $builder
-            ->add('product', ChoiceType::class, [
-                'choices' => [
-                    'Наушники' => 100,
-                    'Чехол для телефона' => 20,
-                ],
-                'constraints' => [
-                    new NotBlank(),
-                ],
-            ])
-            ->add('taxNumber', TextType::class, [
-                'constraints' => [
-                    new NotBlank(),
-                    new Regex([
-                        'pattern' => '/^(DE|IT|GR)\d{9,11}$/',
-                        'message' => 'Неверный формат tax номера',
-                    ]),
-                ],
-            ])
-            ->add('submit', SubmitType::class);
+        $this->productService = $productService;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array $options
+     * @return void
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $productChoices = $this->productService->getAllProducts();
+
+        $builder
+            ->add('product', ChoiceType::class, [
+                'label' => 'Выберите продукт',
+                'choices' => $productChoices,
+                'multiple' =>false,
+                'choice_label' => function (Product $product = null) {
+                    return $product ? $product->getName() . ' (' . $product->getPrice() . ' евро)' : '';
+                },
+                'choice_value' => function (Product $product = null) {
+                    return $product?->getId();
+                },
+            ])
+            ->add('taxNumber', TextType::class, [
+                'label' => 'Введите tax номер',
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Рассчитать цену',
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     * @return void
+     */
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => null,
